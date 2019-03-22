@@ -1,5 +1,5 @@
 # placeholder
 
-![Travis CI status](https://travis-ci.org/pyaillet/placeholder.svg?branch=master)
+[![Build Status](https://travis-ci.org/pyaillet/placeholder.svg?branch=master)](https://travis-ci.org/pyaillet/placeholder)
 
 Minimal project used to handle placeholders in file
