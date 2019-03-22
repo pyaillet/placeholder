@@ -65,3 +65,13 @@ func TestUniq_two(t *testing.T) {
 
 	assert.Equal(t, expected, actual)
 }
+
+func TestListPlaceHoldersInFiles_ok(t *testing.T) {
+	data := []string{"./testdata/example.html", "./testdata/example.js"}
+
+	actual := ListPlaceHoldersInFiles(data)
+
+	expected := []string{"INDEX", "MESSAGE", "TITLE"}
+
+	assert.Equal(t, expected, actual)
+}
