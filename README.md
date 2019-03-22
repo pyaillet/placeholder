@@ -1,3 +1,3 @@
 # placeholder
 
-Minimal projects used to handle placeholders in file
+Minimal project used to handle placeholders in file
