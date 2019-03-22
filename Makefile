@@ -5,7 +5,7 @@ go.mod:
 	go mod init github.com/pyaillet/placeholder
 
 test:
-	go test github.com/pyaillet/placeholder/pkg/... -v
+	go test github.com/pyaillet/placeholder/pkg/... -v -race -coverprofile=coverage.txt -covermode=atomic
 
 watch:
 	watch go test github.com/pyaillet/placeholder/pkg -v
