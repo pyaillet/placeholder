@@ -61,9 +61,9 @@ func TestUniq_two(t *testing.T) {
 
 	actual := uniq(data)
 
-	expected := []string{"FIRST", "SECOND"}
-
-	assert.Equal(t, expected, actual)
+	assert.Equal(t, 2, len(actual))
+	assert.Contains(t, actual, "FIRST")
+	assert.Contains(t, actual, "SECOND")
 }
 
 func TestListPlaceHoldersInFiles_ok(t *testing.T) {

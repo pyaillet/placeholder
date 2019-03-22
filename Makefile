@@ -1,4 +1,4 @@
-build: go.mod
+build: go.mod test
 	go build -o dist/placeholder cmd/main.go
 
 go.mod:
