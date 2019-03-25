@@ -1,9 +1,12 @@
 package placeholder
 
 import (
+	"fmt"
 	"io/ioutil"
+	"os"
 	"regexp"
 	"sort"
+	"strings"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -72,4 +75,35 @@ func uniq(list []string) []string {
 		l = append(l, k)
 	}
 	return l
+}
+
+// ReplacingPlaceHolders replaces place holders in the string according to the
+// values map content
+func ReplacingPlaceHolders(data []byte, values map[string]string, sep Separator) []byte {
+	result := string(data)
+	for k, v := range values {
+		result = strings.Replace(result, sep.start+k+sep.end, v, -1)
+	}
+	return []byte(result)
+}
+
+// ReplacingPlaceHoldersFromEnv replaces place holders in the string from
+// Env vars
+func ReplacingPlaceHoldersFromEnv(data []byte, sep Separator) ([]byte, error) {
+	keys := listPlaceHolders(data, sep)
+	var notFound []string
+	values := make(map[string]string, len(keys))
+	for _, k := range keys {
+		v, p := os.LookupEnv(k)
+		if !p {
+			notFound = append(notFound, k)
+		} else {
+			values[k] = v
+		}
+	}
+	if len(notFound) > 0 {
+		err := fmt.Errorf("Some values were not found: %v", notFound)
+		return nil, err
+	}
+	return ReplacingPlaceHolders(data, values, sep), nil
 }
