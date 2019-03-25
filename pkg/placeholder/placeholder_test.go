@@ -69,7 +69,7 @@ func TestUniq_two(t *testing.T) {
 func TestListPlaceHoldersInFiles_ok(t *testing.T) {
 	data := []string{"./testdata/example.html", "./testdata/example.js"}
 
-	actual := ListPlaceHoldersInFiles(data)
+	actual := ListPlaceHoldersInFiles(data, DefaultSeparator())
 
 	expected := []string{"INDEX", "MESSAGE", "TITLE"}
 

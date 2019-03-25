@@ -14,7 +14,7 @@ type Separator struct {
 	end   string
 }
 
-func defaultSeparator() Separator {
+func DefaultSeparator() Separator {
 	return Separator{
 		start: "%#",
 		end:   "#%",
@@ -42,14 +42,14 @@ func listPlaceHolders(data []byte, sep Separator) []string {
 }
 
 // ListPlaceHoldersInFiles lists placeholders contained in files
-func ListPlaceHoldersInFiles(files []string) []string {
+func ListPlaceHoldersInFiles(files []string, sep Separator) []string {
 	var all []string
 	for _, f := range files {
 		file, err := ioutil.ReadFile(f)
 		if err != nil {
 			log.Errorf("Couldn't read file %s\n", f)
 		}
-		ph1 := listPlaceHolders(file, defaultSeparator())
+		ph1 := listPlaceHolders(file, sep)
 		all = append(all, ph1...)
 	}
 	return postProcess(all)
@@ -72,8 +72,4 @@ func uniq(list []string) []string {
 		l = append(l, k)
 	}
 	return l
-}
-
-func combinePlaceHolders(ph1 []string, ph2 []string) []string {
-	return append(ph1, ph2...)
 }
