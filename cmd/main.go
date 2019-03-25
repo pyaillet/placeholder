@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/pyaillet/placeholder/pkg/placeholder"
+	ph "github.com/pyaillet/placeholder/pkg/placeholder"
 	"github.com/urfave/cli"
 )
 
@@ -20,7 +20,7 @@ func main() {
 			Aliases: []string{"ls"},
 			Usage:   "list place holders on the provided files",
 			Action: func(c *cli.Context) error {
-				placeHolders := placeholder.ListPlaceHoldersInFiles(c.Args())
+				placeHolders := ph.ListPlaceHoldersInFiles(c.Args(), ph.DefaultSeparator())
 				fmt.Printf("%s\n", strings.Join(placeHolders, "\n"))
 				return nil
 			},
