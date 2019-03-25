@@ -71,7 +71,7 @@ func TestListPlaceHoldersInFiles_ok(t *testing.T) {
 
 	actual := ListPlaceHoldersInFiles(data, DefaultSeparator())
 
-	expected := []string{"INDEX", "MESSAGE", "TITLE"}
+	expected := []string{"INDEX", "MESSAGE_WITH_COMPOSED_KEY", "TITLE"}
 
 	assert.Equal(t, expected, actual)
 }

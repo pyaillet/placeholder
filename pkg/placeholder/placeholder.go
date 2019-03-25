@@ -32,7 +32,7 @@ func ListPlaceHolders(data []byte, sep Separator) []string {
 
 func listPlaceHolders(data []byte, sep Separator) []string {
 	var l []string
-	re := regexp.MustCompile(sep.start + "(.*?)" + sep.end)
+	re := regexp.MustCompile(sep.start + "([A-Za-z][A-Za-z0-9_]*?)" + sep.end)
 
 	matches := re.FindAllSubmatch(data, -1)
 	for _, match := range matches {
