@@ -18,4 +18,4 @@ clean:
 	rm dist/*
 
 release: go.mod test
-	go build -o dist/placeholder ${LDFLAGS} cmd/main.go
+	gox -os="linux darwin windows" -arch="amd64" ${LDFLAGS} -output "dist/placeholder.{{.OS}}.{{.Arch}}" -verbose ./...
