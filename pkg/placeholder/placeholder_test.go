@@ -2,6 +2,8 @@ package placeholder
 
 import (
 	"fmt"
+	"io"
+	"io/ioutil"
 	"os"
 	"testing"
 
@@ -133,8 +135,81 @@ func TestReplacingPlaceHoldersFromEnv_error_some_undefined(t *testing.T) {
 
 	actual, actualErr := ReplacingPlaceHoldersFromEnv([]byte(data), DefaultSeparator())
 
-	resultErr := fmt.Errorf("Some values were not found: %v", []string{"THIRD"})
+	resultErr := fmt.Errorf("Some values were not found: %+q", []string{"THIRD"})
 
 	assert.Nil(t, actual)
 	assert.Equal(t, actualErr, resultErr)
+}
+
+func TestReplacingPlaceHoldersInFilesFromEnv_ok(t *testing.T) {
+	copyFile("./testdata/example.html", "./testdata/example1.html")
+	copyFile("./testdata/example.js", "./testdata/example1.js")
+
+	os.Setenv("TITLE", "My title")
+	os.Setenv("MESSAGE_WITH_COMPOSED_KEY", "This is my message")
+	os.Setenv("INDEX", "0")
+
+	files := []string{"./testdata/example1.html", "./testdata/example1.js"}
+	err := ReplacingPlaceHoldersInFilesFromEnv(files, DefaultSeparator())
+
+	assert.Nil(t, err)
+	assertSameFileContent(t, "./testdata/example1.html", "./testdata/example.html_result")
+	assertSameFileContent(t, "./testdata/example1.js", "./testdata/example.js_result")
+
+	os.Remove("./testdata/example1.html")
+	os.Remove("./testdata/example1.js")
+}
+
+func TestReplacingPlaceHoldersInFilesFromEnv_ko_some_values_not_found(t *testing.T) {
+	copyFile("./testdata/example.html", "./testdata/example1.html")
+	copyFile("./testdata/example.js", "./testdata/example1.js")
+
+	os.Setenv("TITLE", "My title")
+	os.Unsetenv("MESSAGE_WITH_COMPOSED_KEY")
+	os.Setenv("INDEX", "0")
+
+	files := []string{"./testdata/example1.html", "./testdata/example1.js"}
+	actualErr := ReplacingPlaceHoldersInFilesFromEnv(files, DefaultSeparator())
+
+	expectedErr := fmt.Errorf("Some values were not found: %+q", []string{"MESSAGE_WITH_COMPOSED_KEY"})
+
+	assert.Equal(t, actualErr, expectedErr)
+
+	os.Remove("./testdata/example1.html")
+	os.Remove("./testdata/example1.js")
+}
+
+func copyFile(src, dst string) (int64, error) {
+	sourceFileStat, err := os.Stat(src)
+	if err != nil {
+		return 0, err
+	}
+
+	if !sourceFileStat.Mode().IsRegular() {
+		return 0, fmt.Errorf("%s is not a regular file", src)
+	}
+
+	source, err := os.Open(src)
+	if err != nil {
+		return 0, err
+	}
+	defer source.Close()
+
+	destination, err := os.Create(dst)
+	if err != nil {
+		return 0, err
+	}
+	defer destination.Close()
+	nBytes, err := io.Copy(destination, source)
+	return nBytes, err
+}
+
+func assertSameFileContent(t *testing.T, expected, actual string) {
+	actualContent, err := ioutil.ReadFile(actual)
+	assert.Nil(t, err)
+
+	expectedContent, err := ioutil.ReadFile(expected)
+	assert.Nil(t, err)
+
+	assert.Equal(t, expectedContent, actualContent)
 }

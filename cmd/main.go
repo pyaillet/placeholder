@@ -18,11 +18,20 @@ func main() {
 		{
 			Name:    "list",
 			Aliases: []string{"ls"},
-			Usage:   "list place holders on the provided files",
+			Usage:   "list placeholders in the provided files",
 			Action: func(c *cli.Context) error {
 				placeHolders := ph.ListPlaceHoldersInFiles(c.Args(), ph.DefaultSeparator())
 				fmt.Printf("%s\n", strings.Join(placeHolders, "\n"))
 				return nil
+			},
+		},
+		{
+			Name:    "replace",
+			Aliases: []string{"rp"},
+			Usage:   "replace placeholders in the provided files",
+			Action: func(c *cli.Context) error {
+				err := ph.ReplacingPlaceHoldersInFilesFromEnv(c.Args(), ph.DefaultSeparator())
+				return err
 			},
 		},
 	}

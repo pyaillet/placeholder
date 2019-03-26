@@ -91,6 +91,14 @@ func ReplacingPlaceHolders(data []byte, values map[string]string, sep Separator)
 // Env vars
 func ReplacingPlaceHoldersFromEnv(data []byte, sep Separator) ([]byte, error) {
 	keys := listPlaceHolders(data, sep)
+	values, err := getValuesFromEnv(keys)
+	if err != nil {
+		return nil, err
+	}
+	return ReplacingPlaceHolders(data, values, sep), nil
+}
+
+func getValuesFromEnv(keys []string) (map[string]string, error) {
 	var notFound []string
 	values := make(map[string]string, len(keys))
 	for _, k := range keys {
@@ -102,8 +110,30 @@ func ReplacingPlaceHoldersFromEnv(data []byte, sep Separator) ([]byte, error) {
 		}
 	}
 	if len(notFound) > 0 {
-		err := fmt.Errorf("Some values were not found: %v", notFound)
-		return nil, err
+		err := fmt.Errorf("Some values were not found: %+q", notFound)
+		return values, err
 	}
-	return ReplacingPlaceHolders(data, values, sep), nil
+	return values, nil
+}
+
+// ReplacingPlaceHoldersInFilesFromEnv replaces placeholders in file from
+// environment variables
+func ReplacingPlaceHoldersInFilesFromEnv(files []string, sep Separator) error {
+	keys := ListPlaceHoldersInFiles(files, sep)
+	values, err := getValuesFromEnv(keys)
+	if err != nil {
+		return err
+	}
+	for _, f := range files {
+		content, err := ioutil.ReadFile(f)
+		if err != nil {
+			return err
+		}
+		content = ReplacingPlaceHolders(content, values, sep)
+		err = ioutil.WriteFile(f, content, 0644)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
