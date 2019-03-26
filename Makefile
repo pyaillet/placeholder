@@ -1,3 +1,7 @@
+VERSION=`git describe --tags`
+
+LDFLAGS=-ldflags "-X main.version=${VERSION}"
+
 build: go.mod test
 	go build -o dist/placeholder cmd/main.go
 
@@ -13,3 +17,5 @@ watch:
 clean:
 	rm dist/*
 
+release: go.mod test
+	go build -o dist/placeholder ${LDFLAGS} cmd/main.go

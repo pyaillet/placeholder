@@ -10,9 +10,12 @@ import (
 	"github.com/urfave/cli"
 )
 
+var version string
+
 func main() {
 	app := cli.NewApp()
 	app.Name = "placeholder"
+	app.Version = version
 	app.Usage = "Manage the placeholders"
 	app.Commands = []cli.Command{
 		{
