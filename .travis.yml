@@ -1,10 +1,20 @@
 language: go
-
 env:
   - GO111MODULE=on
-
 go:
 - 1.12.x
-
+before_install:
+  - go get github.com/mitchellh/gox
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+deploy:
+  provider: releases
+  api_key:
+    secure: f6n9pvA0T8q6odWHR4GB+4gv9Y34/2IDrSPinzaxorZH5lE4E2qHyK32x5zTPJmQ+hLaLK2o63iL1IEsUdLrJjIYwg90hUTK5o3PIbcWZOvliTK+7M7LJCcskkF8p/BNy+vx2UIvzg+AmrQ4Wt1NEs590g0bB+grvvKTGhvQd5u/ha3WMZx9rSqCOw5UP7LvUZEHNgA6jM2g903r7ahHw6cs26QDFII2s8a3jaTpHWN8BNMX1QK7Yvi2BAfeEuG4cErTR01ajeS25QO6SBbqAz5MWHiS15eNrsB/v769LkJbWxNTLXgUWfhXxBX/L3NiwzVOtbyceUYYjQ/J4BcppBqaj5q7kOtd8snmD+d/vTaKB3m8Onk/F9ZplVu/rtXDLx1l4DFAjO4sRg4GfFJtZtvq3Z7Q4j6mxaxOiaTJ7W+tyt+7EZf7RtVZ55vexDvW24Q/1lHaKlJ0dmutxkVhZklE6pAIz/nOF6iIEuGjGIsy3zxLvUW4nnMUh2Gj/9EONJB6mwLVdqU6Kky4MfbA/qfVzpgO6gl7EbJ/pE3IoFYyoAxiSF9/i/1m1ROgdPhWl+93WBnIftDoCcRVYLjDHAvkZTTVwU1XqXUAvG6z0RD7dJkxBrk6CvwmdvfYxuy6OrdG8RY4T3f/BKbKTzn5lYU82xPNzJBydiPXnYGsSqo=
+  file:
+  - "dist/placeholder.darwin.amd64"
+  - "dist/placeholder.linux.amd64"
+  - "dist/placeholder.windows.amd64.exe"
+  skip_cleanup: true
+  on:
+    tags: true

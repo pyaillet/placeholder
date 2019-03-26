@@ -3,7 +3,8 @@ VERSION=`git describe --tags`
 LDFLAGS=-ldflags "-X main.version=${VERSION}"
 
 build: go.mod test
-	go build -o dist/placeholder cmd/main.go
+	if [ -z ${VERSION} ]; then go build -o dist/placeholder cmd/main.go; fi
+	if [ ! -z ${VERSION} ]; then gox -os="linux darwin windows" -arch="amd64" ${LDFLAGS} -output "dist/placeholder.{{.OS}}.{{.Arch}}" -verbose ./...; fi
 
 go.mod:
 	go mod init github.com/pyaillet/placeholder
@@ -18,4 +19,4 @@ clean:
 	rm dist/*
 
 release: go.mod test
-	go build -o dist/placeholder ${LDFLAGS} cmd/main.go
+	gox -os="linux darwin windows" -arch="amd64" ${LDFLAGS} -output "dist/placeholder.{{.OS}}.{{.Arch}}" -verbose ./...
