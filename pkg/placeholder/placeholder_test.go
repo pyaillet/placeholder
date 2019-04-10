@@ -40,6 +40,18 @@ func TestListPlaceHolders_ok_in_order(t *testing.T) {
 
 }
 
+func TestListPlaceHolders_alternate_ok_in_order(t *testing.T) {
+	data := "{{THIRD}} {{FIRST}} azpoerkjapzoje \n {{SECOND}} {{THIRD}}"
+	sep := SeparatorFrom("{{", "}}")
+
+	actual := ListPlaceHolders([]byte(data), sep)
+
+	expected := []string{"FIRST", "SECOND", "THIRD"}
+
+	assert.Equal(t, expected, actual)
+
+}
+
 func TestListPlaceHolders_uniq(t *testing.T) {
 	data := "%#FIRST#%\n%#FIRST#%"
 	sep := Separator{

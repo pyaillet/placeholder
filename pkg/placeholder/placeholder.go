@@ -24,6 +24,13 @@ func DefaultSeparator() Separator {
 	}
 }
 
+func SeparatorFrom(start, end string) Separator {
+	return Separator{
+		start: regexp.QuoteMeta(start),
+		end:   regexp.QuoteMeta(end),
+	}
+}
+
 func postProcess(l []string) []string {
 	return sortInPlace(uniq(l))
 }
