@@ -12,10 +12,7 @@ import (
 
 func TestListPlaceHolders_ok(t *testing.T) {
 	data := "%#FIRST#% azpoerkjapzoje \n %#SECOND#% %#THIRD#%"
-	sep := Separator{
-		start: "%#",
-		end:   "#%",
-	}
+	sep := SeparatorFrom("%#", "#%")
 
 	actual := ListPlaceHolders([]byte(data), sep)
 
@@ -27,10 +24,7 @@ func TestListPlaceHolders_ok(t *testing.T) {
 
 func TestListPlaceHolders_ok_in_order(t *testing.T) {
 	data := "%#THIRD#% %#FIRST#% azpoerkjapzoje \n %#SECOND#% %#THIRD#%"
-	sep := Separator{
-		start: "%#",
-		end:   "#%",
-	}
+	sep := SeparatorFrom("%#", "#%")
 
 	actual := ListPlaceHolders([]byte(data), sep)
 
@@ -54,10 +48,7 @@ func TestListPlaceHolders_alternate_ok_in_order(t *testing.T) {
 
 func TestListPlaceHolders_uniq(t *testing.T) {
 	data := "%#FIRST#%\n%#FIRST#%"
-	sep := Separator{
-		start: "%#",
-		end:   "#%",
-	}
+	sep := SeparatorFrom("%#", "#%")
 
 	actual := ListPlaceHolders([]byte(data), sep)
 

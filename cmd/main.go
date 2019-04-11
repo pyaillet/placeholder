@@ -23,7 +23,9 @@ func main() {
 			Aliases: []string{"ls"},
 			Usage:   "list placeholders in the provided files",
 			Action: func(c *cli.Context) error {
-				sep := ph.SeparatorFrom(c.String("start"), c.String("end"))
+				start := c.GlobalString("start")
+				end := c.GlobalString("end")
+				sep := ph.SeparatorFrom(start, end)
 				placeHolders := ph.ListPlaceHoldersInFiles(c.Args(), sep)
 				fmt.Printf("%s\n", strings.Join(placeHolders, "\n"))
 				return nil
@@ -34,7 +36,9 @@ func main() {
 			Aliases: []string{"rp"},
 			Usage:   "replace placeholders in the provided files",
 			Action: func(c *cli.Context) error {
-				sep := ph.SeparatorFrom(c.String("start"), c.String("end"))
+				start := c.GlobalString("start")
+				end := c.GlobalString("end")
+				sep := ph.SeparatorFrom(start, end)
 				err := ph.ReplacingPlaceHoldersInFilesFromEnv(c.Args(), sep)
 				return err
 			},
