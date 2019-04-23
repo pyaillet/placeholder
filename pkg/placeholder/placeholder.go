@@ -11,6 +11,8 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
+
+	"github.com/magiconair/properties"
 )
 
 // ValuesProvider define an interface exposing values
@@ -40,6 +42,9 @@ func NewFileProvider(input string) (*FileProvider, error) {
 	if strings.HasSuffix(input, "json") {
 		return newFileProviderJSON(file)
 	}
+	if strings.HasSuffix(input, "properties") {
+		return newFileProviderProperties(file)
+	}
 	return newFileProvider(file)
 }
 
@@ -55,6 +60,14 @@ func newFileProviderJSON(content []byte) (*FileProvider, error) {
 		ret[k] = v.(string)
 	}
 	return &FileProvider{values: ret}, nil
+}
+
+func newFileProviderProperties(content []byte) (*FileProvider, error) {
+	p, err := properties.LoadString(string(content))
+	if err != nil {
+		return nil, err
+	}
+	return &FileProvider{values: p.Map()}, nil
 }
 
 func newFileProviderYaml(content []byte) (*FileProvider, error) {

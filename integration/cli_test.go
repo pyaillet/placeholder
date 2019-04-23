@@ -111,6 +111,16 @@ func TestReplaceWithYamlFile(t *testing.T) {
 	os.Remove(testPath + "default_separator_copy.js")
 }
 
+func TestReplaceWithPropertiesFile(t *testing.T) {
+	copyFile(testPath+"default_separator.js", testPath+"default_separator_copy.js")
+
+	_, err := launchToolWithFlags(t, "rp", "-i", testPath+"values.properties", testPath+"default_separator_copy.js")
+	assert.Nil(t, err)
+
+	assertSameFileContent(t, testPath+"default_separator.js_result", testPath+"default_separator_copy.js")
+	os.Remove(testPath + "default_separator_copy.js")
+}
+
 func TestMain(m *testing.M) {
 	err := os.Chdir("..")
 	if err != nil {
