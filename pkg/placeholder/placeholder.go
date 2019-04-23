@@ -1,6 +1,7 @@
 package placeholder
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -9,7 +10,86 @@ import (
 	"strings"
 
 	log "github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v2"
 )
+
+// ValuesProvider define an interface exposing values
+type ValuesProvider interface {
+	getValue(key string) (string, bool)
+}
+
+// FileProvider implements ValuesProvider with values extracted from a json or yaml file
+type FileProvider struct {
+	values map[string]string
+}
+
+func (v FileProvider) getValue(key string) (string, bool) {
+	val, ok := v.values[key]
+	return val, ok
+}
+
+// NewFileProvider creates a new FileProvider from a json or yaml file
+func NewFileProvider(input string) (*FileProvider, error) {
+	file, err := ioutil.ReadFile(input)
+	if err != nil {
+		return nil, err
+	}
+	if strings.HasSuffix(input, "yaml") {
+		return newFileProviderYaml(file)
+	}
+	if strings.HasSuffix(input, "json") {
+		return newFileProviderJSON(file)
+	}
+	return newFileProvider(file)
+}
+
+func newFileProviderJSON(content []byte) (*FileProvider, error) {
+	var data interface{}
+	ret := map[string]string{}
+	err := json.Unmarshal(content, &data)
+	if err != nil {
+		return nil, err
+	}
+	msg := data.(map[string]interface{})
+	for k, v := range msg {
+		ret[k] = v.(string)
+	}
+	return &FileProvider{values: ret}, nil
+}
+
+func newFileProviderYaml(content []byte) (*FileProvider, error) {
+	var data interface{}
+	ret := map[string]string{}
+	err := yaml.Unmarshal(content, &data)
+	if err != nil {
+		return nil, err
+	}
+	msg := data.(map[interface{}]interface{})
+	for k, v := range msg {
+		key := k.(string)
+		ret[key] = v.(string)
+	}
+	return &FileProvider{values: ret}, nil
+}
+
+func newFileProvider(content []byte) (*FileProvider, error) {
+	// try with json
+	provider, err := newFileProviderJSON(content)
+	if err != nil {
+		provider, err = newFileProviderYaml(content)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return provider, nil
+}
+
+// EnvProvider implements ValuesProvider with values extracted from environment
+type EnvProvider struct{}
+
+func (v EnvProvider) getValue(key string) (string, bool) {
+	return os.LookupEnv(key)
+}
 
 // Separator structure with start and end delimiters
 type Separator struct {
@@ -86,31 +166,30 @@ func uniq(list []string) []string {
 
 // ReplacingPlaceHolders replaces place holders in the string according to the
 // values map content
-func ReplacingPlaceHolders(data []byte, values map[string]string, sep Separator) []byte {
+func replacingPlaceHoldersFromValues(data []byte, values map[string]string, separator Separator) []byte {
 	result := string(data)
 	for k, v := range values {
-		result = strings.Replace(result, sep.start+k+sep.end, v, -1)
+		result = strings.Replace(result, separator.start+k+separator.end, v, -1)
 	}
 	return []byte(result)
 }
 
-// ReplacingPlaceHoldersFromEnv replaces place holders in the string from
-// Env vars
-func ReplacingPlaceHoldersFromEnv(data []byte, sep Separator) ([]byte, error) {
-	keys := listPlaceHolders(data, sep)
-	values, err := getValuesFromEnv(keys)
+// ReplacingPlaceHolders replaces place holders in the string from values provider
+func ReplacingPlaceHolders(data []byte, separator Separator, provider ValuesProvider) ([]byte, error) {
+	keys := listPlaceHolders(data, separator)
+	values, err := getValues(keys, provider)
 	if err != nil {
 		return nil, err
 	}
-	return ReplacingPlaceHolders(data, values, sep), nil
+	return replacingPlaceHoldersFromValues(data, values, separator), nil
 }
 
-func getValuesFromEnv(keys []string) (map[string]string, error) {
+func getValues(keys []string, provider ValuesProvider) (map[string]string, error) {
 	var notFound []string
 	values := make(map[string]string, len(keys))
 	for _, k := range keys {
-		v, p := os.LookupEnv(k)
-		if !p {
+		v, ok := provider.getValue(k)
+		if !ok {
 			notFound = append(notFound, k)
 		} else {
 			values[k] = v
@@ -123,11 +202,10 @@ func getValuesFromEnv(keys []string) (map[string]string, error) {
 	return values, nil
 }
 
-// ReplacingPlaceHoldersInFilesFromEnv replaces placeholders in file from
-// environment variables
-func ReplacingPlaceHoldersInFilesFromEnv(files []string, sep Separator) error {
-	keys := ListPlaceHoldersInFiles(files, sep)
-	values, err := getValuesFromEnv(keys)
+// ReplacingPlaceHoldersInFiles replaces placeholders in file from values provider
+func ReplacingPlaceHoldersInFiles(files []string, separator Separator, provider ValuesProvider) error {
+	keys := ListPlaceHoldersInFiles(files, separator)
+	values, err := getValues(keys, provider)
 	if err != nil {
 		return err
 	}
@@ -136,7 +214,7 @@ func ReplacingPlaceHoldersInFilesFromEnv(files []string, sep Separator) error {
 		if err != nil {
 			return err
 		}
-		content = ReplacingPlaceHolders(content, values, sep)
+		content = replacingPlaceHoldersFromValues(content, values, separator)
 		err = ioutil.WriteFile(f, content, 0644)
 		if err != nil {
 			return err

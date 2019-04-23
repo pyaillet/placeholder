@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/pyaillet/placeholder/pkg/placeholder"
 	ph "github.com/pyaillet/placeholder/pkg/placeholder"
 	"github.com/urfave/cli"
 )
@@ -27,7 +28,7 @@ func main() {
 				end := c.GlobalString("end")
 				sep := ph.SeparatorFrom(start, end)
 				placeHolders := ph.ListPlaceHoldersInFiles(c.Args(), sep)
-				fmt.Printf("%s\n", strings.Join(placeHolders, "\n"))
+				fmt.Printf("%s", strings.Join(placeHolders, "\n"))
 				return nil
 			},
 		},
@@ -39,8 +40,25 @@ func main() {
 				start := c.GlobalString("start")
 				end := c.GlobalString("end")
 				sep := ph.SeparatorFrom(start, end)
-				err := ph.ReplacingPlaceHoldersInFilesFromEnv(c.Args(), sep)
+				input := c.String("input")
+				var provider placeholder.ValuesProvider
+				if len(input) == 0 {
+					provider = placeholder.EnvProvider{}
+				} else {
+					var err error
+					provider, err = placeholder.NewFileProvider(input)
+					if err != nil {
+						panic(err)
+					}
+				}
+				err := ph.ReplacingPlaceHoldersInFiles(c.Args(), sep, provider)
 				return err
+			},
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "input, i",
+					Usage: "input file (json or yaml)",
+				},
 			},
 		},
 	}

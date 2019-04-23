@@ -107,7 +107,7 @@ func TestReplacingPlaceHolders_ok(t *testing.T) {
 		"THIRD":  "third",
 	}
 
-	actual := ReplacingPlaceHolders([]byte(data), values, DefaultSeparator())
+	actual := replacingPlaceHoldersFromValues([]byte(data), values, DefaultSeparator())
 
 	expected := "first azpoerkjapzoje third \n second"
 
@@ -121,7 +121,7 @@ func TestReplacingPlaceHoldersFromEnv_ok(t *testing.T) {
 	os.Setenv("SECOND", "second")
 	os.Setenv("THIRD", "third")
 
-	actual, err := ReplacingPlaceHoldersFromEnv([]byte(data), DefaultSeparator())
+	actual, err := ReplacingPlaceHolders([]byte(data), DefaultSeparator(), EnvProvider{})
 
 	expected := "first azpoerkjapzoje third \n second"
 
@@ -136,7 +136,7 @@ func TestReplacingPlaceHoldersFromEnv_error_some_undefined(t *testing.T) {
 	os.Setenv("SECOND", "second")
 	os.Unsetenv("THIRD")
 
-	actual, actualErr := ReplacingPlaceHoldersFromEnv([]byte(data), DefaultSeparator())
+	actual, actualErr := ReplacingPlaceHolders([]byte(data), DefaultSeparator(), EnvProvider{})
 
 	resultErr := fmt.Errorf("Some values were not found: %+q", []string{"THIRD"})
 
@@ -153,7 +153,7 @@ func TestReplacingPlaceHoldersInFilesFromEnv_ok(t *testing.T) {
 	os.Setenv("INDEX", "0")
 
 	files := []string{"./testdata/example1.html", "./testdata/example1.js"}
-	err := ReplacingPlaceHoldersInFilesFromEnv(files, DefaultSeparator())
+	err := ReplacingPlaceHoldersInFiles(files, DefaultSeparator(), EnvProvider{})
 
 	assert.Nil(t, err)
 	assertSameFileContent(t, "./testdata/example1.html", "./testdata/example.html_result")
@@ -172,7 +172,7 @@ func TestReplacingPlaceHoldersInFilesFromEnv_ko_some_values_not_found(t *testing
 	os.Setenv("INDEX", "0")
 
 	files := []string{"./testdata/example1.html", "./testdata/example1.js"}
-	actualErr := ReplacingPlaceHoldersInFilesFromEnv(files, DefaultSeparator())
+	actualErr := ReplacingPlaceHoldersInFiles(files, DefaultSeparator(), EnvProvider{})
 
 	expectedErr := fmt.Errorf("Some values were not found: %+q", []string{"MESSAGE_WITH_COMPOSED_KEY"})
 
@@ -215,4 +215,27 @@ func assertSameFileContent(t *testing.T, expected, actual string) {
 	assert.Nil(t, err)
 
 	assert.Equal(t, expectedContent, actualContent)
+}
+
+func Test_newFileProviderJson_ok(t *testing.T) {
+
+	file := "{ \"KEY\":\"VALUE\" }"
+	p, err := newFileProvider([]byte(file))
+	assert.Nil(t, err)
+
+	actual, ok := p.getValue("KEY")
+	assert.True(t, ok)
+	assert.Equal(t, "VALUE", actual)
+}
+
+func Test_newFileProviderYaml_ok(t *testing.T) {
+
+	file := `KEY: VALUE`
+
+	p, err := newFileProvider([]byte(file))
+	assert.Nil(t, err)
+
+	actual, ok := p.getValue("KEY")
+	assert.True(t, ok)
+	assert.Equal(t, "VALUE", actual)
 }
