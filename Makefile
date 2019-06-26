@@ -5,6 +5,9 @@ LDFLAGS=-ldflags "-X main.version=${VERSION}"
 placeholder:
 	go build -o dist/placeholder cmd/main.go
 
+docker-build:
+	docker run -it -v $(shell pwd):/app -w /app golang:1.12 ./build.sh
+
 build: go.mod test
 	if [ -z ${VERSION} ]; then go build -o dist/placeholder cmd/main.go; fi
 	if [ ! -z ${VERSION} ]; then gox -os="linux darwin windows" -arch="amd64" ${LDFLAGS} -output "dist/placeholder.{{.OS}}.{{.Arch}}" -verbose ./cmd; fi
@@ -22,6 +25,6 @@ clean:
 	rm dist/*
 
 release: go.mod test
-	gox -os="linux darwin windows" -arch="amd64" ${LDFLAGS} -output "dist/placeholder.{{.OS}}.{{.Arch}}" -verbose ./...
+	gox -os="linux darwin windows" -arch="amd64" ${LDFLAGS} -output "dist/placeholder.{{.OS}}.{{.Arch}}" -verbose ./cmd
 
 .DEFAULT_GOAL := build
