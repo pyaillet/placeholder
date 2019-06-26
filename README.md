@@ -37,7 +37,7 @@ $ cat values.json
 }
 ```
 ```shell
-$ placeholder -s \${ -e \} replace -i values.json template.file
+$ placeholder replace -i values.json template.file
 ```
 ```shell
 $ cat template.file
@@ -54,7 +54,7 @@ $ cat values.yaml
 KEY: value from yaml
 ```
 ```shell
-$ placeholder -s \${ -e \} replace -i values.yaml template.file
+$ placeholder replace -i values.yaml template.file
 ```
 ```shell
 $ cat template.file
@@ -71,7 +71,7 @@ $ cat values.properties
 KEY=value from properties
 ```
 ```shell
-$ placeholder -s \${ -e \} replace -i values.properties template.file
+$ placeholder replace -i values.properties template.file
 ```
 ```shell
 $ cat template.file
@@ -84,7 +84,7 @@ The key value is value from properties
 ### From environment
 
 ```shell
-$ KEY="value from env" placeholder -s \${ -e \} replace template.file
+$ KEY="value from env" placeholder replace template.file
 ```
 ```shell
 $ cat template.file
@@ -93,3 +93,18 @@ This is a simple template file containing a <KEY> placeholder surrounded with
 
 The key value is value from env
 ```
+
+### Bloc separator
+You can also change the default bloc separator by specifying the start and end bloc with the `-s` and `-e` arguments :
+
+```shell
+$ placeholder -s '%#' -e '#%' replace -i values.json template.file
+```
+```shell
+$ cat template.file
+This is a simple template file containing a <KEY> placeholder surrounded with
+'%#' and '#%' which will be replaced by the value contained in a value file.
+
+The key value is value from env
+```
+

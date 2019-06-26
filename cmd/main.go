@@ -64,12 +64,12 @@ func main() {
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "start, s",
-			Value: "%#",
+			Value: "${",
 			Usage: "Separator starting separator",
 		},
 		cli.StringFlag{
 			Name:  "end, e",
-			Value: "#%",
+			Value: "}",
 			Usage: "Separator ending separator",
 		},
 	}
