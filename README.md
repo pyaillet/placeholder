@@ -29,14 +29,17 @@ This is a simple template file containing a <KEY> placeholder surrounded with
 '${' and '}' which will be replaced by the value contained in a value file.
 
 The key value is ${KEY}
-
+```
+```shell
 $ cat values.json
 {
   "KEY": "value from json"
 }
-
+```
+```shell
 $ placeholder -s \${ -e \} replace -i values.json template.file
-
+```
+```shell
 $ cat template.file
 This is a simple template file containing a <KEY> placeholder surrounded with
 '${' and '}' which will be replaced by the value contained in a value file.
