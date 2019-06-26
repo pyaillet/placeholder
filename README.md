@@ -49,9 +49,11 @@ The key value is value from json
 ```shell
 $ cat values.yaml
 KEY: value from yaml
-
+```
+```shell
 $ placeholder -s \${ -e \} replace -i values.yaml template.file
-
+```
+```shell
 $ cat template.file
 This is a simple template file containing a <KEY> placeholder surrounded with
 '${' and '}' which will be replaced by the value contained in a value file.
@@ -64,9 +66,11 @@ The key value is value from yaml
 ```shell
 $ cat values.properties
 KEY=value from properties
-
+```
+```shell
 $ placeholder -s \${ -e \} replace -i values.properties template.file
-
+```
+```shell
 $ cat template.file
 This is a simple template file containing a <KEY> placeholder surrounded with
 '${' and '}' which will be replaced by the value contained in a value file.
@@ -78,7 +82,8 @@ The key value is value from properties
 
 ```shell
 $ KEY="value from env" placeholder -s \${ -e \} replace template.file
-
+```
+```shell
 $ cat template.file
 This is a simple template file containing a <KEY> placeholder surrounded with
 '${' and '}' which will be replaced by the value contained in a value file.
