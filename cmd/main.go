@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/pyaillet/placeholder/pkg/placeholder"
-	ph "github.com/pyaillet/placeholder/pkg/placeholder"
 	"github.com/urfave/cli"
 )
 
@@ -26,8 +25,8 @@ func main() {
 			Action: func(c *cli.Context) error {
 				start := c.GlobalString("start")
 				end := c.GlobalString("end")
-				sep := ph.SeparatorFrom(start, end)
-				placeHolders := ph.ListPlaceHoldersInFiles(c.Args(), sep)
+				sep := placeholder.SeparatorFrom(start, end)
+				placeHolders := placeholder.ListPlaceHoldersInFiles(c.Args(), sep)
 				fmt.Printf("%s", strings.Join(placeHolders, "\n"))
 				return nil
 			},
@@ -39,7 +38,7 @@ func main() {
 			Action: func(c *cli.Context) error {
 				start := c.GlobalString("start")
 				end := c.GlobalString("end")
-				sep := ph.SeparatorFrom(start, end)
+				sep := placeholder.SeparatorFrom(start, end)
 				input := c.String("input")
 				var provider placeholder.ValuesProvider
 				if len(input) == 0 {
@@ -51,7 +50,7 @@ func main() {
 						panic(err)
 					}
 				}
-				err := ph.ReplacingPlaceHoldersInFiles(c.Args(), sep, provider)
+				err := placeholder.ReplacingPlaceHoldersInFiles(c.Args(), sep, provider)
 				return err
 			},
 			Flags: []cli.Flag{
