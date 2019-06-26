@@ -124,7 +124,7 @@ func TestReplaceWithPropertiesFile(t *testing.T) {
 func TestReplaceCustomWithPropertiesFile(t *testing.T) {
 	copyFile(testPath+"custom_separator_2.js", testPath+"custom_separator_2_copy.js")
 
-	_, err := launchToolWithFlags(t, "-s", "${", "-e", "}", "rp", "-i", testPath+"values.properties", testPath+"custom_separator_2_copy.js")
+	_, err := launchToolWithFlags(t, "-s", "%#", "-e", "#%", "rp", "-i", testPath+"values.properties", testPath+"custom_separator_2_copy.js")
 	assert.Nil(t, err)
 
 	assertSameFileContent(t, testPath+"default_separator.js_result", testPath+"custom_separator_2_copy.js")
