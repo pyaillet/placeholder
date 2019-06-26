@@ -124,6 +124,10 @@ func SeparatorFrom(start, end string) Separator {
 	}
 }
 
+func (sep Separator) String() string {
+	return fmt.Sprintf("start: %s, end: %s", sep.start, sep.end)
+}
+
 func postProcess(l []string) []string {
 	return sortInPlace(uniq(l))
 }
@@ -180,11 +184,11 @@ func uniq(list []string) []string {
 // ReplacingPlaceHolders replaces place holders in the string according to the
 // values map content
 func replacingPlaceHoldersFromValues(data []byte, values map[string]string, separator Separator) []byte {
-	result := string(data)
 	for k, v := range values {
-		result = strings.Replace(result, separator.start+k+separator.end, v, -1)
+		re := regexp.MustCompile(separator.start + k + separator.end)
+		data = re.ReplaceAll(data, []byte(v))
 	}
-	return []byte(result)
+	return data
 }
 
 // ReplacingPlaceHolders replaces place holders in the string from values provider

@@ -75,7 +75,7 @@ func assertSameFileContent(t *testing.T, expected, actual string) {
 	expectedContent, err := ioutil.ReadFile(expected)
 	assert.Nil(t, err)
 
-	assert.Equal(t, expectedContent, actualContent)
+	assert.Equal(t, string(expectedContent), string(actualContent))
 }
 
 func TestReplaceWithEnv(t *testing.T) {
@@ -119,6 +119,16 @@ func TestReplaceWithPropertiesFile(t *testing.T) {
 
 	assertSameFileContent(t, testPath+"default_separator.js_result", testPath+"default_separator_copy.js")
 	os.Remove(testPath + "default_separator_copy.js")
+}
+
+func TestReplaceCustomWithPropertiesFile(t *testing.T) {
+	copyFile(testPath+"custom_separator_2.js", testPath+"custom_separator_2_copy.js")
+
+	_, err := launchToolWithFlags(t, "-s", "${", "-e", "}", "rp", "-i", testPath+"values.properties", testPath+"custom_separator_2_copy.js")
+	assert.Nil(t, err)
+
+	assertSameFileContent(t, testPath+"default_separator.js_result", testPath+"custom_separator_2_copy.js")
+	os.Remove(testPath + "custom_separator_2_copy.js")
 }
 
 func TestMain(m *testing.M) {
