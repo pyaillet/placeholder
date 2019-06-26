@@ -108,3 +108,11 @@ This is a simple template file containing a <KEY> placeholder surrounded with
 The key value is value from env
 ```
 
+## Build it
+
+To build this project, you must have make and go >= 1.12 installed.
+You can then just type:
+`make build`
+
+If you don't want to install go but use docker instead, type:
+`make docker-build`
